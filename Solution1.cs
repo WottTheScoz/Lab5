@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DnD_Lab : MonoBehaviour
+public class Solution1 : MonoBehaviour
 {
     public string CharacterName;
     public string Class;
@@ -42,8 +42,6 @@ public class DnD_Lab : MonoBehaviour
         {30, 30, 10},
     };
 
-    //int DebugInt = 21;
-
     //All classes currently in the system alongside their respective dice (8 is a d8, 12 is a d12, etc.)
     Dictionary<string, int> ClassAndDice = new Dictionary<string, int>()
     {
@@ -73,17 +71,17 @@ public class DnD_Lab : MonoBehaviour
 
         CheckForNegative();
 
-        Debug.LogFormat("My character {0} is a level {1} {2} with a CON score of {3} and {4} a Hill Dwarf and {5} Tough feat. I want the HP {6}. Total HP: {7}", CharacterName, Level, Class, Constitution, HillDwarfString, ToughString, AveragedString, HP);
+        FinalResults(CONAndModifier[0, 0], CONAndModifier[15, 1]);
     }
 
     //Calculates HP based on if the user wants their dice rolled or averaged.
     void CalculateDice(int DiceMax)
     {
-        if(Averaged == true)
+        if (Averaged == true)
         {
             HP = (((DiceMax + 1) / 2) + CurrentModifier) * Level;
-        } 
-        else 
+        }
+        else
         {
             //Rolls dice based on class' dice type, then adds modifier value to the roll. Repeats per level.
             for (int i = 0; i < Level; i++)
@@ -95,9 +93,8 @@ public class DnD_Lab : MonoBehaviour
                 //Debug.Log("DR with added modifier: " + DiceRoll);
                 HP += DiceRoll;
             }
-            //Debug.Log("subtotal HP: " + HP);
         }
-        Debug.Log("subtotal HP: " + HP);
+        //Debug.Log("subtotal HP: " + HP);
     }
 
     //Determines modifier based on the given constitution score.
@@ -168,24 +165,13 @@ public class DnD_Lab : MonoBehaviour
             case var value when value == CONAndModifier[15, 0]:
                 CurrentModifier = CONAndModifier[15, 2];
                 break;
-            default:
-                Debug.Log("Invalid Constitution Score");
-                break;
         }
-
-        /*switch (Constitution)
-        {
-            case var value when value == DebugInt:
-                CurrentModifier = DebugInt;
-                Debug.Log(CurrentModifier);
-                break;
-        }*/
     }
 
     //Turns boolean inputs into strings which will be shown in the console. Also increases HP if applicable.
     void BoolToString()
     {
-        if(IsHillDwarf == true)
+        if (IsHillDwarf == true)
         {
             HillDwarfString = "is";
             HP += Level;
@@ -195,7 +181,7 @@ public class DnD_Lab : MonoBehaviour
             HillDwarfString = "is not";
         }
 
-        if(HasTough == true)
+        if (HasTough == true)
         {
             ToughString = "has";
             HP += Level * 2;
@@ -205,7 +191,7 @@ public class DnD_Lab : MonoBehaviour
             ToughString = "does not have";
         }
 
-        if(Averaged == true)
+        if (Averaged == true)
         {
             AveragedString = "averaged";
         }
@@ -215,11 +201,25 @@ public class DnD_Lab : MonoBehaviour
         }
     }
 
+    //Checks if the final HP value is less than 1 and changes its value to 1 if true.
     void CheckForNegative()
     {
-        if(HP < 1)
+        if (HP < 1)
         {
             HP = 1;
+        }
+    }
+
+    void FinalResults(int MinCon, int MaxCon)
+    {
+        //Invalidates the final score if the given constitution score < the minimum score or > the maximum score.
+        if (Constitution >= MinCon && Constitution <= MaxCon)
+        {
+            Debug.LogFormat("My character {0} is a level {1} {2} with a CON score of {3} and {4} a Hill Dwarf and {5} Tough feat. I want the HP {6}. Total HP: {7}", CharacterName, Level, Class, Constitution, HillDwarfString, ToughString, AveragedString, HP);
+        }
+        else
+        {
+            Debug.LogFormat("Unable to calculate HP; constitution score is less than {0} or greater than {1}.", MinCon, MaxCon);
         }
     }
 }
